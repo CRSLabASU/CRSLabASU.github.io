@@ -1,13 +1,15 @@
-jemdoc
-    home                [index.html]
-    download            [download.html]
-    revision history    [revision.html]
-    contact             [contact.html]
+CRSLAB
+    Home                [index.html]
+    Research            [research.html]
+    Downlaod            [download.html]
+    Contact             [contact.html]
 
-user's guide
-    cheat sheet         [cheatsheet.html]
-    using               [using.html]
+User
+    Hao Zhang           [Hao/hao.html]
+    Ze Gong             [Ze/ze.html]
+    Daniel Hill         [Daniel/daniel.html]
+    Zachary Ayers       [Zachary/zachary.html]
 
 goodies
-    add a menu          [menu.html]
-    other stuff         [stuff.html]
+    Lab activies        [activies.html]
+    Conferences         [conferences.html]
