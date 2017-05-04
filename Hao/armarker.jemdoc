@@ -1,0 +1,24 @@
+# jemdoc: menu{MENU}{hao.html}
+= Project -- Simulating Pick and Place Operation Using AR Markers
+
+== 1. Introduction
+
+In this project, we simulate robot's pick and place in [http://gazebosim.org/ gzaebo]. In the simulated enviorment we place a pr2 robot with kinect sensor, a table with a object on it.
+
+(To be continued...)  
+
+== 2. Hardware and Software Requirements
+
+(To be continued...)
+
+== 3. Code
+
+(To be continued...)
+
+== 4. Intructions
+
+(To be continued...)
+
+== 5. Notes
+
+(To be continued...)
