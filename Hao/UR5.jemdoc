@@ -1,0 +1,91 @@
+# jemdoc: menu{MENU}{hao.html}
+= Project -- Pick and Place Operation with UR5
+
+== 1. Introduction
+
+This project uses the UR5 robot to pick a block attached with AR tag on one table and then to place it on  another place marked with AR tag on same table. 
+
+== 2. Requirements
+
+~~~
+{hardware required}
+- [https://www.universal-robots.com/products/ur5-robot/ UR5 robot] with [http://robotiq.com/products/adaptive-robot-gripper/ robotiq gripper]
+- Microsoft Xbox One Kinect Sensor
+~~~
+
+~~~
+{software required}
+- ROS Indigo
+- [https://github.com/OpenKinect/libfreenect2/ libfreenect2]
+- [https://github.com/code-iai/iai_kinect2/tree/master/kinect2_bridge/ iai_kinect2]
+- [http://wiki.ros.org/ar_track_alvar/ ar_track_alvar]
+- [https://github.com/ThomasTimm/ur_modern_driver/ ur_modern_driver]
+~~~
+
+== 3. Instructions
+
+The steps of project is as following:
+
+*I. Power on UR5 robot and waiting for loading system. Make sure robot is connected to network by wire cable.*
+
+*II. Establish the scenario of this project:*
+- You need a flat table and move the robot near this table. 
+
+- Place a block attached with an AR tag on table. 
+
+- Fix another AR tag on table face which has different position from block. Note that, the distance between this two position could not be long, ohterwise it would effect the tags' recognition.
+
+- Attach third AR tag on end effector of robot arm. Remember, DIFFRENT AR TAG HAS DIFFERENT ID.
+
+- Using teach pendant of UR5 to move robot arm to an appropriate place above the block and table. Appropriate place here means that robot arm can reach the place of block and AR tag on table without any protective stop. Also make sure the distance between tag on robot arm and block could not be long.
+
+- Install libfreenect2 in your computer as kinect driver. You can find the steps [https://github.com/OpenKinect/libfreenect2/ here]. After installation you can test wether or not the kinect works.
+
+- If your kinect works, mount it on a tripod and place it beside the table. Make sure that all the AR tags can be visible to kinect. 
+
+*III. Calibration for kinect.* 
+	
+The position of every joint of robot arm we can get directly from teach pendant. Also we can get the tags' positions from kinect by using tools, for example ar_track_alvar. However joint's position and tags' position has diffrent frame trees. So, we must establish or look up the transform between this two frame. the steps are as follows:
+
+1. Obtain two frame trees under ROS.
+	- Get the robot frame: Install [https://github.com/ThomasTimm/ur_modern_driver/ ur_modern_driver]. Get the ip of robot from teach pendant. Then run the command:
+~~~
+	roslaunch ur_modern_driver ur5_bringup.launch robot_ip:=IP_OF_THE_ROBOT
+~~~
+
+	- Get the kinect frame: Install [https://github.com/code-iai/iai_kinect2/tree/master/kinect2_bridge/ iai_kinect2]. Run the command:
+~~~
+	roslaunch kinect2_bridge kinect2_bridge.launch publish_tf:=true
+~~~
+
+2. Obtain the position of AR tags under kinect frame by using [http://wiki.ros.org/ar_track_alvar/ ar_track_alvar]. 
+	- Set up camera infomation in launch file pr2_indiv.launch:
+~~~
+	<arg name="cam_image_topic" default="\/kinect2\/sd\/points" \/>
+
+	<arg name="cam_info_topic" default="\/kinect2\/sd\/camera_info" \/>
+
+	<arg name="output_frame" default="kinect2_link" \/>
+~~~
+	
+	- Then run the command below:
+~~~
+	roslaunch ar_track_alvar pr2_indiv.launch
+~~~
+	
+	- The position of each tag now you can get from ros topic ar_pose_marker
+
+3. Establish transframe between two frame trees:
+	- We can get transform between kinect2_link and marker frame of tag on robot by:
+~~~
+    rosrun tf tf_echo [marker_frame] kinect2_link
+~~~ 
+	
+	- Launch the rviz, we can get the info about axis rotation between robot end effector frame ee_link and  maker frame. Because we use AR tag to mark the position of end effector. So this two frames have same origin.
+	
+	- With two info above, we can make a static transform between kinect2_link and ee_link by [http://wiki.ros.org/static_transform_publisher/ static_transform_publisher].
+
+
+*IV. Pick and Place operation.* 
+	
+After establishing the transform between robot frame tree and kinect frame tree. We can konw the position of block and goal poition under robot frame tree. Thus, we only need to send that positions info to robot. Here we use socket communication. Write a server program on comuputer to send position info got from kinect under robot frame tree, then using UR Script to write a client on teach pendant to operate move, pick and place with position info from computer. An example socket connection codes you can find [http://www.zacobria.com/universal-robots-knowledge-base-tech-support-forum-hints-tips/knowledge-base/script-from-host-to-robot-via-socket-connection/ here]  
