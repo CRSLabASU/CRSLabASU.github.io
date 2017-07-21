@@ -1,0 +1,74 @@
+# jemdoc: menu{MENU}{sahil.html}
+= Project -- Plan Explicability and Predictability for Robot Task Planning
+
+== 1. Introduction
+
+write your intro  
+
+== 2. Hardware and Software Requirements
+
+~~~
+{hardware required}
+- CUDA Compute 3.0 compatible NVIDIA Graphics Card if intended to work with GPU. Although optional, it is highly recommended for faster training time.
+~~~
+
+~~~
+{software required}
+- Python 3.5
+- TensorFlow
+- Keras
+- CUDA® Toolkit 8.0 (if intended to work with GPU)
+- NVIDIA drivers associated with CUDA Toolkit 8.0 (if intended to work with GPU)
+- cuDNN v5.1 (if intended to work with GPU)
+    -- [https://www.python.org/downloads/release/python-350/]
+    -- [https://www.tensorflow.org/]
+    -- [https://keras.io/]
+    -- [http://docs.nvidia.com/cuda/cuda-installation-guide-microsoft-windows/]
+    -- [https://developer.nvidia.com/cudnn]
+~~~
+
+
+== 3. Code
+
+~~~
+you can find the code of this project [https://github.com/CRSLabASU/CRSLabASU.github.io here]
+~~~
+(To be continued...)
+
+== 4. Intructions
+
+The steps of project is as following:
+
+1. launch a new environment in gazebo with a pr2 robot, a table and a object on table. you can use this command to launch: 
+~~~
+	*roslaunch pr2_gazebo pr2_our_world.launch*
+~~~  
+
+2. Add three AR markers to label the position where robot stops in front of table, the position of object and the position where to place object. We have done this step in previous launch file, or you can write your own launch file.
+
+3. AR tags can be captured by kinect sensor on pr2. In order to identify and track the pose of individual AR tags, we can use ROS package ar_track_alvar which can integrate kinect depth data for better pose estimates. You can simply type:
+~~~
+	*roslaunch ar_track_alvar pr2_indiv.launch*
+~~~
+
+4. You are almost ready to move the robot to the position of Ar marker which locates in front of table. We need a localization system for a robot moving, thus we can get the current pose of robot and determine whether robot reaches the objective position. Here we use ROS API amcl:
+~~~
+	*rosrun amcl amcl scan:=base_scan*
+~~~
+
+5. We also need to write a node to subscibe the topics which publish the pose info of AR tags and robot's current pose, publish velocity message to move robot until it gets to objective position. In our code, this node is moving_to_table, you can run it by typing:
+~~~
+	*rosrun my_robot_manipulation moving_to_table*
+~~~
+
+6. Finally, perfom pick and place operation. Here we use tool MoveIt! for motion planning. Use the launch file that you created in configuring Moveit!:
+~~~
+	*roslaunch your_pr2_moveit_generated moveit_planning_execution.launch*
+~~~ 
+Then running node pick_place to execute actions in gazebo
+
+(To be continued...)
+
+== 5. Notes
+
+(To be continued...)

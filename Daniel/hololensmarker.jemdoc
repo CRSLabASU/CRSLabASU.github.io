@@ -1,0 +1,70 @@
+# jemdoc: menu{MENU}{daniel.html}
+= Project -- Using HoloLens markers to send location to Robot
+
+== 1. Introduction
+
+The goal of this project is for the user to be able to place a marker in 3D space using the HoloLens and the robot knows where that is.  This can only be achieved if the robot and the HoloLens are able to communicate between their two different map forms (Mesh and Gmap).  The main problem in this project is taking a slice of a mesh map from the generated room mesh of the HoloLens and converting that into a Gmap format.  The robot will then receive this map and try to match it with its own map of the given room.  Once it has found the proper location in the given room it will then attempt to go there or accomplish whatever goal is dictated by the user of the HoloLens.  This last step requires path mapping and possibly color mapping.
+
+(To be continued...)
+
+== 2. Hardware and Software Requirements
+
+~~~
+{hardware required}
+- Microsoft HoloLens
+- Mobile robot
+- Robot Lazer map
+~~~
+
+~~~
+{software required}
+- Unity
+- ROS Indigo \n
+(To be continued)
+~~~
+
+== 3. Code
+
+== 4. Instructions
+
+The steps of the project are as follows:
+
+1. Generate Room Scan using [https://www.microsoft.com/en-us/hololens HoloLens]
+- HoloLens naturally recognizes preeviously visited rooms
+- Around 10x10 meter room size
+
+2. Enter Mesh editor in Unity and eliminate all faces not at desired level of robot lazer scan
+- The components of a mesh in Unity are easily anylized using the following format
+~~~
+mesh = GetComponent<MeshFilter>().mesh; \n
+verts = mesh.vertices; \n
+foreach(Vector3 vert in verts) \n
+{ \n
+    vertPos = transform.TransformPoint(vert); \n
+    print(vertPos); \n
+}
+~~~
+
+3. Take an Orthographic top-down photo of desired remaining room mesh mesh
+- Unity Orthographic Camera documentation can be found [https://docs.unity3d.com/ScriptReference/Camera-orthographic.html here]
+
+4. Save this file externally and send to Robot
+~~~
+
+~~~
+
+5. Robot interprets Map
+~~~
+
+~~~
+
+6. Robot moves to Location specified
+~~~
+
+~~~
+
+(To be continued...)
+
+== 5. Notes
+
+(To be continued...)

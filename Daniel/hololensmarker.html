@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta name="generator" content="jemdoc, see http://jemdoc.jaboc.net/" />
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<link rel="stylesheet" href="jemdoc.css" type="text/css" />
+<title>Project &ndash; Using HoloLens markers to send location to Robot</title>
+</head>
+<body>
+<table summary="Table for page layout." id="tlayout">
+<tr valign="top">
+<td id="layout-menu">
+<div class="menu-category">CRSLAB</div>
+<div class="menu-item"><a href="../index.html">Home</a></div>
+<div class="menu-item"><a href="../research.html">Research</a></div>
+<div class="menu-item"><a href="../download.html">Downlaod</a></div>
+<div class="menu-item"><a href="../contact.html">Contact</a></div>
+<div class="menu-category">User</div>
+<div class="menu-item"><a href="../Hao/hao.html">Hao&nbsp;Zhang</a></div>
+<div class="menu-item"><a href="../Ze/ze.html">Ze&nbsp;Gong</a></div>
+<div class="menu-item"><a href="daniel.html" class="current">Daniel&nbsp;Hill</a></div>
+<div class="menu-item"><a href="../Zachary/zachary.html">Zachary&nbsp;Ayers</a></div>
+<div class="menu-item"><a href="../Sahil/sahil.html">Sahil&nbsp;Rajesh&nbsp;Dhayalkar</a></div>
+<div class="menu-category">goodies</div>
+<div class="menu-item"><a href="../activies.html">Lab&nbsp;activies</a></div>
+<div class="menu-item"><a href="../conferences.html">Conferences</a></div>
+</td>
+<td id="layout-content">
+<div id="toptitle">
+<h1>Project &ndash; Using HoloLens markers to send location to Robot</h1>
+</div>
+<h2>1. Introduction</h2>
+<p>The goal of this project is for the user to be able to place a marker in 3D space using the HoloLens and the robot knows where that is.  This can only be achieved if the robot and the HoloLens are able to communicate between their two different map forms (Mesh and Gmap).  The main problem in this project is taking a slice of a mesh map from the generated room mesh of the HoloLens and converting that into a Gmap format.  The robot will then receive this map and try to match it with its own map of the given room.  Once it has found the proper location in the given room it will then attempt to go there or accomplish whatever goal is dictated by the user of the HoloLens.  This last step requires path mapping and possibly color mapping.</p>
+<p>(To be continued&hellip;)</p>
+<h2>2. Hardware and Software Requirements</h2>
+<div class="infoblock">
+<div class="blocktitle">hardware required</div>
+<div class="blockcontent">
+<ul>
+<li><p>Microsoft HoloLens</p>
+</li>
+<li><p>Mobile robot</p>
+</li>
+<li><p>Robot Lazer map</p>
+</li>
+</ul>
+</div></div>
+<div class="infoblock">
+<div class="blocktitle">software required</div>
+<div class="blockcontent">
+<ul>
+<li><p>Unity</p>
+</li>
+<li><p>ROS Indigo <br />
+(To be continued)</p>
+</li>
+</ul>
+</div></div>
+<h2>3. Code</h2>
+<h2>4. Instructions</h2>
+<p>The steps of the project are as follows:</p>
+<p>1. Generate Room Scan using <a href="https://www.microsoft.com/en-us/hololens">HoloLens</a></p>
+<ul>
+<li><p>HoloLens naturally recognizes preeviously visited rooms</p>
+</li>
+<li><p>Around 10x10 meter room size</p>
+</li>
+</ul>
+<p>2. Enter Mesh editor in Unity and eliminate all faces not at desired level of robot lazer scan</p>
+<ul>
+<li><p>The components of a mesh in Unity are easily anylized using the following format</p>
+</li>
+</ul>
+<div class="infoblock">
+<div class="blockcontent">
+<p>mesh = GetComponent&lt;MeshFilter&gt;().mesh; <br />
+verts = mesh.vertices; <br />
+foreach(Vector3 vert in verts) <br /></p>
+<p>{ <br />
+vertPos = transform.TransformPoint(vert); <br />
+print(vertPos); <br />
+}</p>
+</div></div>
+<p>3. Take an Orthographic top-down photo of desired remaining room mesh mesh</p>
+<ul>
+<li><p>Unity Orthographic Camera documentation can be found <a href="https://docs.unity3d.com/ScriptReference/Camera-orthographic.html">here</a></p>
+</li>
+</ul>
+<p>4. Save this file externally and send to Robot</p>
+<div class="infoblock">
+<div class="blockcontent">
+</div></div>
+<p>5. Robot interprets Map</p>
+<div class="infoblock">
+<div class="blockcontent">
+</div></div>
+<p>6. Robot moves to Location specified</p>
+<div class="infoblock">
+<div class="blockcontent">
+</div></div>
+<p>(To be continued&hellip;)</p>
+<h2>5. Notes</h2>
+<p>(To be continued&hellip;)</p>
+<div id="footer">
+<div id="footer-text">
+Page generated 2017-05-24 11:00:53 MST, by <a href="http://jemdoc.jaboc.net/">jemdoc</a>.
+</div>
+</div>
+</td>
+</tr>
+</table>
+</body>
+</html>
