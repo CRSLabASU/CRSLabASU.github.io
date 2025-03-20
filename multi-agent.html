@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Yu ("Tony") Zhang: Computer Science and Engineering</title>
+<link href="defaultstyles.css" rel="stylesheet" media="screen" />
+<script type="text/JavaScript" src="curvycorners.js"></script>
+<script type="text/javascript" src="ga.js"></script>
+</head>
+
+<body>
+<div id="container">
+    <div id="ucb"><script type="text/javascript"></script></div>
+    <div id="wrapper">
+        <div id="banner">
+            <img align="left" style="width:120px;height:63px;" src="logo-transparent.png">
+                <img align="right" style="width:140px;height:53px;" src="logomg.png">
+                <h1>Cooperative Robotic Systems (CRS) Lab</h1>
+                <p>Computer Science and Engineering, Arizona State University</p>
+        </div>
+        <div id="nav">
+            <ul>
+                <li><a href="CRS.html">CRS Overview</a></li>
+                <li><a href="members.html">Members</a></li>
+                <li><a href="human-robot.html">Human-robot Systems</a></li>
+                <li><a href="robot-robot.html">Robot-robot Systems</a></li>
+                <li><a><font color="white">Multi-agent Systems</font></a></li>
+            </ul>
+        </div>
+        <div id="page">
+            
+            <div id="content">
+            
+            
+                <!-- Task Allocation -->
+                <div id="contentbarwide" class="contentbar1">
+                    <h3>Task Allocation and Scheduling</h3>
+                    <!--<img width="100%" src="hmodeling.png" title="" id=""/>-->
+                </div>
+                <p align="justify"></p>
+                
+                <p align = "justify">
+                Task allocation and scheduling is a well studied problem in multi-agent systems which deals with assigning agent resources to different tasks. It has a variety of applications that go beyond robotics, such as airline and post office scheduling, mission planning and etc. <br>
+                <a href = ></a><br>
+                <i></i></p>
+                
+                <!------------------------------->
+                <hr   size="10">
+                
+                <div id="contentbarwideright" class="contentbar1">
+                    <h3>Task Allocation</h3>
+                    <img width="85%" src="ta.png" title="" id=""/>
+                </div>
+                
+                <p align="justify"> </p>
+                
+                <p align = "justify">
+                Task allocation with single-task robots, multi-robot tasks and instantaneous assignment, has been shown to be strongly NP-hard. Although this problem has been studied extensively, few efficient approximation algorithms have been pro- vided due to its inherent complexity. Firs, we provide discussions and analyses for two natural greedy heuristics for solving this problem. Then, a new greedy heuristic is introduced, which considers inter-task resource constraints to approximate the influence between different assignments in task allocation. Instead of only looking at the utility of the assignment, our approach computes the expected loss of utility (due to the assigned robots and task) as an offset and uses the offset utility for making the greedy choice. A formal analysis is provided for the new heuristic, which reveals that the solution quality is bounded by two different factors. A new algorithm is then provided to approximate the new heuristic for performance improvement.
+<br><br>
+                Y. Zhang, L.E. Parker<br>
+                <a href = "AAMAS15.pdf">Considering inter-task resource constraints in task allocation</a><br>
+                <i> JAAMAS</i>, 2013.<br>
+                </p>
+                
+            
+                <!------------------------------->
+                <hr   size="10">
+                
+                <div id="contentbarwideright" class="contentbar1">
+                    <h3>Required Cooperation</h3>
+                    <img width="100%" src="rc.png" title="" id=""/>
+                    <img width="100%" src="burglar.png" title="" id=""/>
+                </div>
+                
+                <p align="justify"> </p>
+                
+                <p align = "justify">
+                It is well understood that, through cooperation, multiple agents can achieve tasks that are unachievable by a single agent. However, there are no formal characterizations of situations where cooperation is required to achieve a goal, thus warranting the application of multiple agents. We provide such a formal characterization for multi-agent planning problems with sequential action execution. We first show that determining whether there is required cooperation (RC) is in general intractable even in this limited setting. As a result, we start our analysis with a subset of more restrictive problems where agents are homogeneous. For such problems, we identify two conditions that can cause RC. We establish that when none of these conditions hold, the problem is single-agent solvable; otherwise, we provide upper bounds on the minimum number of agents required. For the remaining problems with heterogeneous agents, we further divide them into two subsets. For one of the subsets, we propose the concept of transformer agent to reduce the number of agents to be considered which is used to improve planning performance.                <br><br>
+                Y. Zhang, S. Sreedharan and S. Kambhampati<br>
+                <a href = "http://rakaposhi.eas.asu.edu/yu-zhang-icaps16.pdf">A Formal Analysis of Required Cooperation in Multi-agent Planning</a><br>
+                <i> ICAPS</i>, 2016.<br>
+                </p>
+  
+              <!------------------------------->
+              <hr   size="10">
+              
+              <div id="contentbarwideright" class="contentbar1">
+                  <h3>Distributed Pathfinding</h3>
+                  <img width="100%" src="multi-agent.png" title="" id=""/>
+              </div>
+              
+              <p align="justify"> </p>
+              
+              <p align = "justify">
+              The task here is to address the multi-agent pathfinding problem with distributed systems that are subject to limited sensing and communication range.
+              Cooperative pathfinding is often addressed in one of two ways in the literature. In fully coupled approaches, robots are considered together and the plans for all robots are constructed simultaneously. In decoupled approaches, the plans are constructed only for a subset of robots at a time. While decoupled approaches can be much faster than fully coupled approaches, they are often suboptimal and incomplete. Although there exist a few decoupled approaches that achieve completeness, global information (which makes global coordination possible) is assumed. Global information may not be accessible in distributed robotic systems. We provide a window-based approach to cooperative pathfinding with limited sensing and communication range in distributed systems (called DisCoF). In DisCoF, robots are assumed to be fully decoupled initially, and may gradually increase the level of coupling in an online and distributed fashion. In some cases, e.g., when global information is needed to solve the problem instance, DisCoF would eventually couple all robots together. DisCoF represents an inherently online approach since robots may only be aware of a subset of robots in the environment at any given point of time. Hence, they do not have enough information to determine non-conflicting plans with all the other robots. Completeness analysis of DisCoF is provided.               <br><br>
+              Y. Zhang, K. Kim and G. Fainekos<br>
+              <a href = "http://www.public.asu.edu/~yzhan442/DARS2014.pdf">DisCoF: Cooperative Pathfinding in Distributed Systems with Limited Sensing and Communication Range</a><br>
+              <i> DARS</i>, 2014.<br>
+              </p>
+  
+            </div>
+    
+        </div> <!-- page div -->
+    </div> <!-- wrapper div -->
+    <div id="footer">
+        <script type="text/javascript"></script>
+            &copy; Yu ("Tony") Zhang
+    </div>
+</div> <!-- container div -->
+</body>
+</html>
