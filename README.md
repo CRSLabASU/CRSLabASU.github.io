@@ -1,5 +1,20 @@
 # CRS Lab Website
 
+[![Build and Deploy](https://github.com/CRSLabASU/CRSLabASU.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/CRSLabASU/CRSLabASU.github.io/actions/workflows/deploy.yml)
+
+> [!IMPORTANT]
+> **I renamed the default branch from `master` to `main`.**
+> If you cloned this repo before the rename, update your local copy by running:
+>
+> ```sh
+> git branch -m master main
+> git fetch origin
+> git branch -u origin/main main
+> git remote set-head origin -a
+> ```
+>
+> New clones need nothing. The site deploys from `main`, so push your changes there.
+
 The website of the Cooperative Robotic Systems (CRS) Laboratory at Arizona State University, live at **https://crslabasu.github.io**.
 
 It is a static site built with [Astro](https://astro.build). Almost all content lives in plain text files (Markdown, YAML, BibTeX), so most updates need no coding: edit a file, commit to `main`, and the site rebuilds and goes live in about two minutes.
