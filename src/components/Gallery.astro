@@ -1,0 +1,247 @@
+---
+import fs from 'node:fs';
+import path from 'node:path';
+
+interface Props {
+  /** Folder under public/ to read images from. */
+  folder?: string;
+  label?: string;
+  /** Milliseconds between automatic slide changes. */
+  interval?: number;
+}
+
+const { folder = 'gallery', label = 'Lab gallery', interval = 5000 } = Astro.props;
+
+// Read at build time: every image in public/<folder>/, ordered by file name,
+// so "01-…", "02-…" prefixes control the order.
+const IMAGE_EXTENSIONS = /\.(jpe?g|png|webp|avif|gif)$/i;
+const dir = path.join(process.cwd(), 'public', folder);
+const files = fs.existsSync(dir)
+  ? fs
+      .readdirSync(dir)
+      .filter((file) => IMAGE_EXTENSIONS.test(file))
+      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+  : [];
+
+// "02-robot-demo.jpg" -> "Robot demo"
+function altFromFileName(file: string): string {
+  const words = file
+    .replace(/\.[^.]+$/, '')
+    .replace(/^\d+[-_ ]*/, '')
+    .replace(/[-_]+/g, ' ')
+    .trim();
+  return words ? words[0].toUpperCase() + words.slice(1) : label;
+}
+
+const slides = files.map((file) => ({
+  src: `/${folder}/${encodeURIComponent(file)}`,
+  alt: altFromFileName(file),
+}));
+---
+
+{/* Falls back to the slotted content (e.g. a single image) when the folder is empty. */}
+{slides.length === 0 && <slot />}
+{
+  slides.length > 0 && (
+    <div
+      class="gallery"
+      role="region"
+      aria-roledescription="carousel"
+      aria-label={label}
+      data-gallery
+      data-interval={interval}
+    >
+      <div class="gallery-viewport">
+        {slides.map((slide, i) => (
+          <img
+            src={slide.src}
+            alt={slide.alt}
+            class:list={['gallery-slide', { 'is-active': i === 0 }]}
+            loading={i === 0 ? 'eager' : 'lazy'}
+            fetchpriority={i === 0 ? 'high' : undefined}
+            decoding="async"
+            aria-hidden={i === 0 ? undefined : 'true'}
+            data-gallery-slide
+          />
+        ))}
+
+        {slides.length > 1 && (
+          <>
+            <button type="button" class="gallery-arrow gallery-prev" aria-label="Previous image" data-gallery-prev>
+              <i class="fa-solid fa-chevron-left" aria-hidden="true" />
+            </button>
+            <button type="button" class="gallery-arrow gallery-next" aria-label="Next image" data-gallery-next>
+              <i class="fa-solid fa-chevron-right" aria-hidden="true" />
+            </button>
+          </>
+        )}
+      </div>
+
+      {slides.length > 1 && (
+        <div class="gallery-dots">
+          {slides.map((_, i) => (
+            <button
+              type="button"
+              class="gallery-dot"
+              aria-label={`Show image ${i + 1} of ${slides.length}`}
+              aria-current={i === 0 ? 'true' : undefined}
+              data-gallery-dot={i}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+<style>
+  .gallery-viewport {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: var(--color-rule-soft);
+    touch-action: pan-y;
+  }
+  .gallery-slide {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  .gallery-slide.is-active {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gallery-slide {
+      transition: none;
+    }
+  }
+
+  .gallery-arrow {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 0;
+    background: rgb(0 0 0 / 0.45);
+    color: #fff;
+    cursor: pointer;
+    opacity: 0.85;
+    transition: background 0.2s;
+  }
+  .gallery-arrow:hover {
+    background: rgb(0 0 0 / 0.75);
+  }
+  .gallery-prev {
+    left: 0.5rem;
+  }
+  .gallery-next {
+    right: 0.5rem;
+  }
+
+  .gallery-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+  .gallery-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    padding: 0;
+    border: 0;
+    border-radius: 9999px;
+    background: var(--color-rule);
+    cursor: pointer;
+    transition: background 0.2s, width 0.2s;
+  }
+  .gallery-dot[aria-current='true'] {
+    width: 1.25rem;
+    background: var(--color-maroon);
+  }
+</style>
+
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-gallery]').forEach((gallery) => {
+    const slides = [...gallery.querySelectorAll<HTMLImageElement>('[data-gallery-slide]')];
+    const dots = [...gallery.querySelectorAll<HTMLButtonElement>('[data-gallery-dot]')];
+    if (slides.length < 2) return;
+
+    const interval = Number(gallery.dataset.interval) || 5000;
+    let current = 0;
+    let timer: number | undefined;
+    let paused = false;
+
+    const show = (index: number) => {
+      current = (index + slides.length) % slides.length;
+      slides.forEach((slide, i) => {
+        const active = i === current;
+        slide.classList.toggle('is-active', active);
+        if (active) slide.removeAttribute('aria-hidden');
+        else slide.setAttribute('aria-hidden', 'true');
+      });
+      dots.forEach((dot, i) => {
+        if (i === current) dot.setAttribute('aria-current', 'true');
+        else dot.removeAttribute('aria-current');
+      });
+      // Warm up the next image so the crossfade never shows a blank frame.
+      slides[(current + 1) % slides.length].loading = 'eager';
+    };
+
+    // Auto-cycle unless the visitor prefers reduced motion, is hovering or
+    // focused on the gallery, or the tab is in the background.
+    const stop = () => window.clearInterval(timer);
+    const start = () => {
+      stop();
+      if (reduceMotion || paused || document.hidden) return;
+      timer = window.setInterval(() => show(current + 1), interval);
+    };
+    const go = (index: number) => {
+      show(index);
+      start(); // restart the countdown after a manual change
+    };
+
+    gallery.querySelector('[data-gallery-prev]')?.addEventListener('click', () => go(current - 1));
+    gallery.querySelector('[data-gallery-next]')?.addEventListener('click', () => go(current + 1));
+    dots.forEach((dot, i) => dot.addEventListener('click', () => go(i)));
+
+    gallery.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') go(current - 1);
+      if (event.key === 'ArrowRight') go(current + 1);
+    });
+
+    const pause = () => {
+      paused = true;
+      stop();
+    };
+    const resume = () => {
+      paused = false;
+      start();
+    };
+    gallery.addEventListener('mouseenter', pause);
+    gallery.addEventListener('mouseleave', resume);
+    gallery.addEventListener('focusin', pause);
+    gallery.addEventListener('focusout', (event) => {
+      if (!gallery.contains(event.relatedTarget as Node)) resume();
+    });
+    document.addEventListener('visibilitychange', start);
+
+    // Swipe on touch screens.
+    let touchStartX = 0;
+    gallery.addEventListener('touchstart', (event) => (touchStartX = event.touches[0].clientX), { passive: true });
+    gallery.addEventListener('touchend', (event) => {
+      const dx = event.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 40) go(current + (dx < 0 ? 1 : -1));
+    });
+
+    start();
+  });
+</script>

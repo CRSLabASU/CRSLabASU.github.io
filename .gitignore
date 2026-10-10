@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+npm-debug.log*
+*.log
+.env
+.vscode/*
+!.vscode/extensions.json
+
+/Neue_Haas_Grotesk_Collection/
+
+
+public/pagefind/
