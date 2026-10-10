@@ -1,0 +1,182 @@
+---
+import { resolveMedia, type MediaSource } from '../lib/media';
+
+interface Props {
+  media: MediaSource;
+  alt: string;
+  class?: string;
+  /** Classes for the wrapping <figure>. */
+  figureClass?: string;
+  /** Load immediately instead of lazily; use for media at the top of the page. */
+  eager?: boolean;
+}
+
+const {
+  media,
+  alt,
+  class: className = 'w-full h-auto',
+  figureClass = 'm-0',
+  eager = false,
+} = Astro.props;
+const { src, caption, poster, autoplay, loop, isVideo } = resolveMedia(media);
+---
+
+<figure class={figureClass}>
+  {
+    isVideo ? (
+      <div class="video-frame relative" data-video-frame>
+        {/* Autoplaying videos start with preload="none" so nothing downloads until
+            they scroll into view; the script below plays them then and pauses
+            them off-screen. */}
+        <video
+          class={className}
+          aria-label={alt}
+          src={src}
+          poster={poster}
+          loop={loop}
+          muted={autoplay}
+          controls
+          playsinline
+          preload={autoplay ? 'none' : 'metadata'}
+          data-autoplay-video={autoplay ? '' : undefined}
+        />
+        <button type="button" class="video-expand" aria-label={`Expand video: ${alt}`} data-video-expand>
+          <i class="fa-solid fa-expand" aria-hidden="true" />
+        </button>
+        <dialog class="video-dialog" aria-label={alt} data-video-dialog>
+          <button type="button" class="video-close" aria-label="Close video" data-video-close>
+            <i class="fa-solid fa-xmark" aria-hidden="true" />
+          </button>
+          <div data-video-slot />
+        </dialog>
+      </div>
+    ) : (
+      <img src={src} alt={alt} class={className} loading={eager ? 'eager' : 'lazy'} decoding="async" />
+    )
+  }
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .video-expand,
+  .video-close {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 0;
+    border-radius: 0.375rem;
+    background: rgb(0 0 0 / 0.55);
+    color: #fff;
+    cursor: pointer;
+  }
+  .video-expand:hover,
+  .video-close:hover {
+    background: rgb(0 0 0 / 0.8);
+  }
+  .video-expand {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+
+  .video-dialog {
+    width: min(92vw, 1200px);
+    max-width: none;
+    margin: auto; /* Tailwind's reset zeroes the default centering margin */
+    padding: 0;
+    border: 0;
+    background: transparent;
+    overflow: visible;
+  }
+  .video-dialog::backdrop {
+    background: rgb(0 0 0 / 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .video-dialog :global(video) {
+    width: 100%;
+    max-height: 85vh;
+    background: #000;
+  }
+  .video-close {
+    margin: 0 0 0.5rem auto;
+  }
+</style>
+
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Autoplay: play while on screen, pause off-screen. Once the visitor pauses a
+  // video themselves, scrolling never restarts it.
+  const autoplayVideos = document.querySelectorAll<HTMLVideoElement>('video[data-autoplay-video]');
+  const pausedByScroll = new WeakSet<HTMLVideoElement>();
+  const pausedByUser = new WeakSet<HTMLVideoElement>();
+
+  autoplayVideos.forEach((video) => {
+    video.addEventListener('pause', () => {
+      if (pausedByScroll.has(video)) pausedByScroll.delete(video);
+      else pausedByUser.add(video);
+    });
+    video.addEventListener('play', () => pausedByUser.delete(video));
+  });
+
+  if (reduceMotion) {
+    // Respect the OS setting: no motion until the visitor presses play.
+    autoplayVideos.forEach((video) => (video.preload = 'metadata'));
+  } else {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const video = entry.target as HTMLVideoElement;
+          if (entry.isIntersecting) {
+            if (pausedByUser.has(video)) continue;
+            video.preload = 'auto';
+            video.play().catch(() => {
+              // Autoplay blocked (e.g. data saver); controls are already shown.
+            });
+          } else if (!video.paused) {
+            pausedByScroll.add(video);
+            video.pause();
+          }
+        }
+      },
+      { threshold: 0.25 },
+    );
+    autoplayVideos.forEach((video) => observer.observe(video));
+  }
+
+  // Expand: move the same <video> into a modal dialog so playback continues
+  // where it was, then move it back on close.
+  document.querySelectorAll<HTMLElement>('[data-video-frame]').forEach((frame) => {
+    const video = frame.querySelector('video')!;
+    const dialog = frame.querySelector<HTMLDialogElement>('[data-video-dialog]')!;
+    const slot = dialog.querySelector<HTMLElement>('[data-video-slot]')!;
+
+    frame.querySelector('[data-video-expand]')!.addEventListener('click', () => {
+      frame.style.minHeight = `${frame.offsetHeight}px`; // hold the page layout
+      slot.append(video);
+      dialog.showModal();
+      document.documentElement.style.overflow = 'hidden';
+    });
+
+    // Runs on the close button, a backdrop click, or Escape (via the close event).
+    const restore = () => {
+      if (video.parentElement === frame) return;
+      frame.prepend(video);
+      frame.style.minHeight = '';
+      document.documentElement.style.overflow = '';
+    };
+    const closeDialog = () => {
+      dialog.close();
+      restore();
+    };
+
+    dialog.querySelector('[data-video-close]')!.addEventListener('click', closeDialog);
+    // Clicking the blurred backdrop (outside the video) closes it.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) closeDialog();
+    });
+    dialog.addEventListener('close', restore);
+  });
+</script>
