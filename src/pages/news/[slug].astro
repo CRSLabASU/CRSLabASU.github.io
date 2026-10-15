@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Media from '../../components/Media.astro';
+import NewsMedia from '../../components/NewsMedia.astro';
 import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
@@ -13,6 +13,8 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
+// `image` and `images` are combined into one list; the first is the one shown first.
+const media = [post.data.image, ...post.data.images].filter((m) => m !== undefined);
 const formattedDate = post.data.date.toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'long',
@@ -22,14 +24,30 @@ const formattedDate = post.data.date.toLocaleDateString('en-US', {
 
 <BaseLayout title={post.data.title} description={post.data.summary}>
   <article class="wrap py-14 pb-16">
-    <a href="/news" data-pagefind-ignore class="font-sans text-sm font-medium no-underline">&larr; All news</a>
-    <p class="meta mt-6 mb-2">{formattedDate}</p>
-    <h1>{post.data.title}</h1>
-    {post.data.image && (
-      <Media media={post.data.image} alt={post.data.title} figureClass="my-8" eager />
-    )}
-    <div class="prose-content text-text max-w-[68ch] text-[17px] leading-[1.7]">
-      <Content />
+    {/* With media: header and text on the left, media on the right (on phones:
+        header, then media, then text). The second row absorbs any extra media
+        height so the text stays directly under the title. */}
+    <div
+      class:list={[
+        'grid grid-cols-1 gap-8',
+        { 'md:grid-cols-[minmax(0,1fr)_minmax(0,400px)] md:grid-rows-[auto_1fr] md:gap-x-14 md:gap-y-6': media.length },
+      ]}
+    >
+      <header>
+        <a href="/news" data-pagefind-ignore class="font-sans text-sm font-medium no-underline">&larr; All news</a>
+        <p class="meta mt-6 mb-2">{formattedDate}</p>
+        <h1 class="mb-0">{post.data.title}</h1>
+      </header>
+
+      {media.length > 0 && (
+        <aside class="md:col-start-2 md:row-span-2 md:row-start-1">
+          <NewsMedia items={media} alt={post.data.title} />
+        </aside>
+      )}
+
+      <div class="prose-content text-text max-w-[68ch] text-[17px] leading-[1.7]">
+        <Content />
+      </div>
     </div>
   </article>
 </BaseLayout>

@@ -1,0 +1,30 @@
+---
+import { resolveMedia, type MediaSource } from '../lib/media';
+
+interface Props {
+  image?: MediaSource;
+  href: string;
+}
+
+const { image, href } = Astro.props;
+
+// Lists show a still: an image as-is, or a video's poster frame. A video with
+// no poster gets no thumbnail rather than autoplaying inside the list.
+const resolved = image ? resolveMedia(image) : undefined;
+const src = resolved?.isVideo ? resolved.poster : resolved?.src;
+---
+
+{
+  src && (
+    <a href={href} class="block shrink-0" tabindex="-1" aria-hidden="true">
+      <img
+        src={src}
+        alt=""
+        class="aspect-[4/3] w-full object-cover md:w-40"
+        loading="lazy"
+        decoding="async"
+        data-pagefind-ignore
+      />
+    </a>
+  )
+}

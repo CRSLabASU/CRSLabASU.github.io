@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import NewsThumbnail from '../../components/NewsThumbnail.astro';
 import { getCollection } from 'astro:content';
 
 const posts = (await getCollection('news')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
@@ -25,13 +26,16 @@ const posts = (await getCollection('news')).sort((a, b) => b.data.date.valueOf()
                   day: 'numeric',
                 })}
               </p>
-              <div>
-                <h2 class="mb-1.5 text-[1.15rem]">
-                  <a href={`/news/${post.slug}`} class="text-ink hover:text-maroon no-underline">
-                    {post.data.title}
-                  </a>
-                </h2>
-                <p class="text-text m-0">{post.data.summary}</p>
+              <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between md:gap-8">
+                <div>
+                  <h2 class="mb-1.5 text-[1.15rem]">
+                    <a href={`/news/${post.slug}`} class="text-ink hover:text-maroon no-underline">
+                      {post.data.title}
+                    </a>
+                  </h2>
+                  <p class="text-text m-0">{post.data.summary}</p>
+                </div>
+                <NewsThumbnail image={post.data.image ?? post.data.images[0]} href={`/news/${post.slug}`} />
               </div>
             </li>
           ))

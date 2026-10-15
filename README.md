@@ -43,10 +43,22 @@ Create `src/content/news/YYYY-MM-short-title.md`:
 title: "Paper accepted to IJCAI 2026"
 date: 2026-05-01
 summary: "One-line summary shown in the news list."
+image: /images/news/ijcai-2026.jpg   # optional: thumbnail in lists + banner on the post
+images:                              # optional: more photos/videos for the post's viewer
+  - /images/news/ijcai-2026-talk.jpg
+  - /images/news/ijcai-2026-group.jpg
 ---
 
 Full text of the post (Markdown).
 ```
+
+Images are optional. Delete the `image`/`images` lines for a text-only post.
+
+- **`image`**: the main picture. It's shown first on the post and is the thumbnail next to the post in the news lists (homepage and News page).
+- **`images`**: any number of extra pictures. On the post, all pictures appear beside the text in one viewer, with small thumbnails underneath to switch between them.
+- Use either or both. With only `images`, the first one is shown first and used as the thumbnail.
+- Put the files in `public/images/news/` (create the folder if needed) and start the path with `/images/news/`.
+- Any entry can also be a video or have a caption. See [Videos](#videos).
 
 ### Add or update a person
 

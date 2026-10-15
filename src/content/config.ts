@@ -8,6 +8,8 @@ const news = defineCollection({
     date: z.coerce.date(),
     summary: z.string(),
     image: mediaSchema.optional(),
+    // More images/videos for the post page; shown in a grid below the text.
+    images: z.array(mediaSchema).default([]),
   }),
 });
 

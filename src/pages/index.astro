@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Gallery from '../components/Gallery.astro';
 import Media from '../components/Media.astro';
+import NewsThumbnail from '../components/NewsThumbnail.astro';
 import { lab } from '../data/lab';
 import { researchThrusts } from '../data/researchThrusts';
 import { sponsors } from '../data/sponsors';
@@ -88,20 +89,23 @@ const news = (await getCollection('news'))
           <h2>Recent updates</h2>
           <ul class="mt-6 mb-7 list-none p-0">
             {news.map((post) => (
-              <li class="border-rule-soft border-t py-4.5 first:border-t-0">
-                <p class="meta">
-                  {post.data.date.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
-                </p>
-                <h3 class="my-1.5">
-                  <a href={`/news/${post.slug}`} class="text-ink hover:text-maroon no-underline">
-                    {post.data.title}
-                  </a>
-                </h3>
-                <p class="m-0">{post.data.summary}</p>
+              <li class="border-rule-soft flex flex-col gap-4 border-t py-4.5 first:border-t-0 md:flex-row md:items-start md:justify-between md:gap-8">
+                <div>
+                  <p class="meta">
+                    {post.data.date.toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </p>
+                  <h3 class="my-1.5">
+                    <a href={`/news/${post.slug}`} class="text-ink hover:text-maroon no-underline">
+                      {post.data.title}
+                    </a>
+                  </h3>
+                  <p class="m-0">{post.data.summary}</p>
+                </div>
+                <NewsThumbnail image={post.data.image ?? post.data.images[0]} href={`/news/${post.slug}`} />
               </li>
             ))}
           </ul>

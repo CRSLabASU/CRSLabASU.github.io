@@ -1,0 +1,126 @@
+---
+import Media from './Media.astro';
+import { resolveMedia, type MediaSource } from '../lib/media';
+
+interface Props {
+  items: MediaSource[];
+  alt: string;
+}
+
+const { items, alt } = Astro.props;
+
+// Thumbnails show a still: the image itself, or a video's poster.
+const thumbs = items.map((item) => {
+  const { src, poster, isVideo } = resolveMedia(item);
+  return isVideo ? poster : src;
+});
+---
+
+{
+  items.length === 1 ? (
+    // A single image keeps its own shape, capped so tall photos stay compact.
+    <Media
+      media={items[0]}
+      alt={alt}
+      class="h-auto max-h-[520px] w-auto max-w-full"
+      figureClass="m-0 w-fit max-w-full"
+      eager
+    />
+  ) : (
+    // Several images: one viewer with a thumbnail strip to switch between them.
+    <div class="news-media" data-news-media>
+      <div class="border-rule bg-paper relative aspect-[4/5] border">
+        {items.map((item, i) => (
+          <div
+            class:list={['absolute inset-0', { invisible: i !== 0 }]}
+            aria-hidden={i === 0 ? undefined : 'true'}
+            data-news-slide
+          >
+            <Media
+              media={item}
+              alt={`${alt} (${i + 1} of ${items.length})`}
+              class="h-full w-full object-contain"
+              figureClass="m-0 h-full border-0 bg-transparent"
+              eager={i === 0}
+            />
+          </div>
+        ))}
+      </div>
+      <div class="mt-3 flex flex-wrap gap-2">
+        {items.map((_, i) => (
+          <button
+            type="button"
+            class="news-thumb"
+            aria-label={`Show image ${i + 1} of ${items.length}`}
+            aria-current={i === 0 ? 'true' : undefined}
+            data-news-thumb={i}
+          >
+            {thumbs[i] ? (
+              <img src={thumbs[i]} alt="" loading="lazy" decoding="async" />
+            ) : (
+              <i class="fa-solid fa-play" aria-hidden="true" />
+            )}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .news-thumb {
+    /* Flex (not grid) so the image's height: 100% resolves to the button's
+       fixed height instead of the photo's natural aspect ratio. */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    width: 4rem;
+    height: 4rem;
+    padding: 0;
+    border: 1px solid var(--color-rule);
+    background: var(--color-paper);
+    color: var(--color-muted);
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+  .news-thumb:hover {
+    opacity: 1;
+  }
+  .news-thumb[aria-current='true'] {
+    opacity: 1;
+    outline: 2px solid var(--color-maroon);
+    outline-offset: 1px;
+  }
+  .news-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-news-media]').forEach((viewer) => {
+    const slides = [...viewer.querySelectorAll<HTMLElement>('[data-news-slide]')];
+    const thumbs = [...viewer.querySelectorAll<HTMLButtonElement>('[data-news-thumb]')];
+
+    thumbs.forEach((thumb, index) =>
+      thumb.addEventListener('click', () => {
+        slides.forEach((slide, i) => {
+          const active = i === index;
+          slide.classList.toggle('invisible', !active);
+          if (active) slide.removeAttribute('aria-hidden');
+          else {
+            slide.setAttribute('aria-hidden', 'true');
+            slide.querySelector('video')?.pause();
+          }
+        });
+        thumbs.forEach((t, i) => {
+          if (i === index) t.setAttribute('aria-current', 'true');
+          else t.removeAttribute('aria-current');
+        });
+      }),
+    );
+  });
+</script>
