@@ -140,14 +140,13 @@ Put images in `public/` and refer to them with a path starting at `/`. For examp
 
 ### Homepage gallery
 
-The slider at the top of the homepage shows every image in `public/gallery/`. To add, remove, or reorder photos, add, delete, or rename files there. No code changes needed.
+The slider at the top of the homepage shows every image in `public/gallery/`, followed by the images from news posts (newest posts first, up to 8). To add, remove, or reorder gallery photos, add, delete, or rename files in `public/gallery/`. No code changes needed. A photo you add to a news post shows up in the slider automatically, so don't also copy it into `public/gallery/` (an identical copy is only shown once anyway).
 
 - **Order** follows the file name, so prefix with numbers: `01-lab-group.jpg`, `02-fetch-demo.jpg`, ….
-- **Alt text** (read aloud by screen readers) comes from the file name: `02-fetch-demo.jpg` becomes "Fetch demo". Use descriptive names.
-- **Shape:** images are cropped to fill a 4:3 frame, so keep the subject near the center.
+- **Shape:** images are cropped to fill a square frame, so keep the subject near the center. Square suits phone photos (portrait); wider shapes crop them more.
 - **Size:** the slider's width is its share of the hero row, set by `md:grid-cols-[1fr_1.4fr]` in `src/pages/index.astro` (text : slider). Raise the second number for a bigger slider, e.g. `1.6fr`. Its height follows the shape: edit `aspect` in `src/components/Gallery.astro` (`'16 / 9'` shorter, `'1 / 1'` taller). Corner rounding is `border-radius` in the same file. Resize to about 1600 px wide and keep each under ~400 KB.
 - It cycles every 5 seconds, pauses while hovered, and can be clicked, swiped, or arrowed through.
-- If the folder is empty or missing, the homepage shows the single `heroImage` from `lab.ts` instead.
+
 
 ### Videos
 
