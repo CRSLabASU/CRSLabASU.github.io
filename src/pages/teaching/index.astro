@@ -1,0 +1,153 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { lab } from '../../data/lab';
+import { byTermDesc, offeringId, termKey, type Offering } from '../../lib/teaching';
+
+const offerings = (await getCollection('teaching')).sort(byTermDesc);
+
+// Highlight the newest term. It's "this semester" while it's current or upcoming
+// (by build date), otherwise just "most recent".
+const latestKey = offerings.length ? termKey(offerings[0].data.term) : 0;
+const latest = offerings.filter((o) => termKey(o.data.term) === latestKey);
+const now = new Date();
+const month = now.getUTCMonth() + 1;
+const nowKey = now.getUTCFullYear() * 10 + (month <= 5 ? 1 : month <= 7 ? 2 : 3);
+const latestLabel = latestKey >= nowKey ? 'This semester' : 'Most recent';
+
+// One row per course, newest offering first; title and summary come from the newest offering.
+const courses = new Map<string, Offering[]>();
+for (const o of offerings) courses.set(o.data.code, [...(courses.get(o.data.code) ?? []), o]);
+
+// A short summary: the description's opening sentences, up to ~220 characters,
+// stopping before a sentence that introduces a list ("…we will study:").
+function summaryOf(entry: Offering): string {
+  const first = ((entry.body ?? '').trim().split(/\n\s*\n/)[0] ?? '')
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+  const sentences = first.match(/[^.!?:]+[.!?:]+["”']?/g) ?? [first];
+  let summary = '';
+  for (const sentence of sentences) {
+    if (sentence.trim().endsWith(':')) break;
+    if (summary && (summary + sentence).length > 220) break;
+    summary += sentence;
+  }
+  return (summary || sentences[0]).trim();
+}
+
+const levelOf = (code: string) => (Number(code.replace(/\D/g, '')) >= 500 ? 'Graduate' : 'Undergraduate');
+---
+
+<BaseLayout
+  title="Teaching"
+  description={`Courses taught by ${lab.director} at Arizona State University: artificial intelligence, human-aware robotics, logic, and theory of computation.`}
+>
+  <section class="wrap py-14 pb-10">
+    <span class="eyebrow">Teaching</span>
+    <h1>Courses</h1>
+  </section>
+
+  {
+    latest.length > 0 && (
+      <section class="border-rule border-t">
+        <div class="wrap py-12">
+          <span class="eyebrow">{latestLabel}</span>
+          <div class="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
+            {latest.map((o) => (
+              <article class="current-card">
+                <p class="meta m-0">
+                  {o.data.code} &middot; {o.data.term}
+                </p>
+                <h2 class="mt-1.5 mb-3">
+                  <a href={`/teaching/${offeringId(o)}/`} class="text-ink hover:text-maroon no-underline">
+                    {o.data.title}
+                  </a>
+                </h2>
+                {o.data.meeting && <p class="text-text m-0 text-[15px]">{o.data.meeting}</p>}
+                <div class="mt-5 flex flex-wrap gap-x-6 gap-y-2">
+                  <a href={`/teaching/${offeringId(o)}/`} class="font-sans text-sm font-medium no-underline">
+                    Course page &rarr;
+                  </a>
+                  {o.data.schedule.length > 0 && (
+                    <a href={`/teaching/${offeringId(o)}/#schedule`} class="font-sans text-sm font-medium no-underline">
+                      Schedule &rarr;
+                    </a>
+                  )}
+                  {o.data.syllabus && (
+                    <a href={o.data.syllabus} class="font-sans text-sm font-medium no-underline">
+                      Syllabus (PDF) &darr;
+                    </a>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="border-rule border-t">
+    <div class="wrap py-12">
+      <span class="eyebrow">All courses</span>
+      <ul class="mt-4 list-none p-0">
+        {
+          [...courses.entries()].map(([code, runs]) => (
+            <li class="border-rule-soft grid grid-cols-1 gap-3 border-t py-8 first:border-t-0 md:grid-cols-[120px_1fr] md:gap-6">
+              <div>
+                <span class="text-maroon block font-serif text-[1.6rem] leading-tight">{code}</span>
+                <span class="meta">{levelOf(code)}</span>
+              </div>
+              <div>
+                <h2 class="mb-2">
+                  <a href={`/teaching/${offeringId(runs[0])}/`} class="text-ink hover:text-maroon no-underline">
+                    {runs[0].data.title}
+                  </a>
+                </h2>
+                <p class="text-text max-w-[62ch]">{summaryOf(runs[0])}</p>
+                <p class="meta mb-2">
+                  Offered {runs.length} {runs.length === 1 ? 'time' : 'times'}
+                </p>
+                <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
+                  {runs.map((o) => (
+                    <li>
+                      <a href={`/teaching/${offeringId(o)}/`} class="term-chip">
+                        {o.data.term}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .current-card {
+    border: 1px solid var(--color-rule);
+    border-radius: 0.5rem;
+    background: var(--color-paper);
+    padding: 1.5rem 1.75rem;
+  }
+  .term-chip {
+    display: inline-block;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--color-rule);
+    border-radius: 999px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--color-text);
+    text-decoration: none;
+    transition:
+      border-color 0.2s,
+      color 0.2s;
+  }
+  .term-chip:hover {
+    border-color: var(--color-maroon);
+    color: var(--color-maroon);
+  }
+</style>

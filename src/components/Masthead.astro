@@ -15,7 +15,7 @@ import { lab } from '../data/lab';
       <img src={lab.asuLogo} alt="Arizona State University" class="h-9 w-auto shrink-0" />
       <span class="bg-rule h-8 w-px shrink-0" aria-hidden="true"></span>
       <img src={lab.labLogo} alt={lab.name} class="h-9 w-auto shrink-0" />
-      <span class="text-muted font-sans text-xs hidden md:inline">{lab.name}</span>
+      <span class="text-muted hidden max-w-[11rem] font-sans text-xs leading-snug lg:inline">{lab.name}</span>
     </a>
     <div class="order-2 flex items-center justify-end gap-2 md:order-3">
       <SearchBox client:load />

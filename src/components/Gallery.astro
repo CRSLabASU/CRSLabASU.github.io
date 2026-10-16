@@ -1,27 +1,44 @@
 ---
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { getCollection } from 'astro:content';
+import { resolveMedia } from '../lib/media';
 
 interface Props {
   /** Folder under public/ to read images from. */
   folder?: string;
+  /** Also show images from news posts (after the folder's images, newest posts first). */
+  includeNews?: boolean;
+  /** Most news images to add, so the slider stays short as news grows. */
+  newsLimit?: number;
   label?: string;
   /** Milliseconds between automatic slide changes. */
   interval?: number;
+  /** Frame shape (CSS aspect-ratio); images are cropped to fill it. */
+  aspect?: string;
 }
 
-const { folder = 'gallery', label = 'Lab gallery', interval = 5000 } = Astro.props;
+const {
+  folder = 'gallery',
+  includeNews = true,
+  newsLimit = 8,
+  label = 'Lab gallery',
+  interval = 5000,
+  aspect = '4 / 3',
+} = Astro.props;
 
-// Read at build time: every image in public/<folder>/, ordered by file name,
-// so "01-…", "02-…" prefixes control the order.
+const publicDir = path.join(process.cwd(), 'public');
 const IMAGE_EXTENSIONS = /\.(jpe?g|png|webp|avif|gif)$/i;
-const dir = path.join(process.cwd(), 'public', folder);
-const files = fs.existsSync(dir)
-  ? fs
-      .readdirSync(dir)
-      .filter((file) => IMAGE_EXTENSIONS.test(file))
-      .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-  : [];
+
+// Identical files (e.g. a news photo also copied into the gallery folder) only show once.
+const seen = new Set<string>();
+function isNew(file: string): boolean {
+  const hash = crypto.createHash('md5').update(fs.readFileSync(file)).digest('hex');
+  if (seen.has(hash)) return false;
+  seen.add(hash);
+  return true;
+}
 
 // "02-robot-demo.jpg" -> "Robot demo"
 function altFromFileName(file: string): string {
@@ -33,13 +50,32 @@ function altFromFileName(file: string): string {
   return words ? words[0].toUpperCase() + words.slice(1) : label;
 }
 
-const slides = files.map((file) => ({
-  src: `/${folder}/${encodeURIComponent(file)}`,
-  alt: altFromFileName(file),
-}));
+// 1. Every image in public/<folder>/, ordered by file name ("01-…", "02-…").
+const dir = path.join(publicDir, folder);
+const slides = (fs.existsSync(dir) ? fs.readdirSync(dir) : [])
+  .filter((file) => IMAGE_EXTENSIONS.test(file))
+  .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+  .filter((file) => isNew(path.join(dir, file)))
+  .map((file) => ({ src: `/${folder}/${encodeURIComponent(file)}`, alt: altFromFileName(file) }));
+
+// 2. Images from news posts (image + images; videos skipped), newest posts first.
+if (includeNews) {
+  const posts = (await getCollection('news')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+  let added = 0;
+  for (const post of posts) {
+    for (const media of [post.data.image, ...post.data.images]) {
+      if (!media || added >= newsLimit) continue;
+      const { src, isVideo } = resolveMedia(media);
+      const file = path.join(publicDir, decodeURI(src));
+      if (isVideo || !src.startsWith('/') || !fs.existsSync(file) || !isNew(file)) continue;
+      slides.push({ src, alt: post.data.title });
+      added++;
+    }
+  }
+}
 ---
 
-{/* Falls back to the slotted content (e.g. a single image) when the folder is empty. */}
+{/* Falls back to the slotted content (e.g. a single image) when there are no images at all. */}
 {slides.length === 0 && <slot />}
 {
   slides.length > 0 && (
@@ -50,6 +86,7 @@ const slides = files.map((file) => ({
       aria-label={label}
       data-gallery
       data-interval={interval}
+      style={`--gallery-aspect: ${aspect}`}
     >
       <div class="gallery-viewport">
         {slides.map((slide, i) => (
@@ -97,7 +134,8 @@ const slides = files.map((file) => ({
 <style>
   .gallery-viewport {
     position: relative;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: var(--gallery-aspect);
+    border-radius: 0.5rem;
     overflow: hidden;
     background: var(--color-rule-soft);
     touch-action: pan-y;

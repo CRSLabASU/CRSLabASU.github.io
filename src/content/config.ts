@@ -39,4 +39,53 @@ const systemProjects = defineCollection({
   }),
 });
 
-export const collections = { news, projects, systemProjects };
+// One file per course offering, named by its URL id (e.g. CSE471-F26.md -> /teaching/CSE471-F26/).
+const teaching = defineCollection({
+  type: 'content',
+  schema: z.object({
+    code: z.string(),
+    title: z.string(),
+    term: z.string().regex(/^(Spring|Summer|Fall) \d{4}$/, 'Use "Spring 2027", "Summer 2027", or "Fall 2027"'),
+    meeting: z.string().optional(),
+    officeHours: z.array(z.object({ who: z.string(), when: z.string() })).default([]),
+    staff: z
+      .array(
+        z.object({
+          role: z.string(),
+          name: z.string(),
+          email: z.string().optional(),
+          office: z.string().optional(),
+        }),
+      )
+      .default([]),
+    prerequisites: z.string().optional(),
+    syllabus: z.string().optional(),
+    scheduleNote: z.string().optional(),
+    schedule: z
+      .array(
+        z.object({
+          date: z.string().optional(),
+          topic: z.string(),
+          notes: z.string().optional(),
+          reading: z.string().optional(),
+          deadline: z.string().optional(),
+          event: z.string().optional(),
+        }),
+      )
+      .default([]),
+    projects: z
+      .array(
+        z.object({
+          title: z.string(),
+          description: z.string(),
+          award: z.string().optional(),
+          youtube: z.string().optional(),
+          video: z.string().optional(),
+          poster: z.string().optional(),
+        }),
+      )
+      .default([]),
+  }),
+});
+
+export const collections = { news, projects, systemProjects, teaching };
