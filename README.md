@@ -63,7 +63,7 @@ Images are optional. Delete the `image`/`images` lines for a text-only post.
 
 ### Add or update a person
 
-In `src/data/people.yaml`, add an entry under `faculty`, `postdocs`, `phd`, `ms`, or `alumni`. Only `name` and `role` are required:
+In `src/data/people.yaml`, add an entry under `faculty`, `postdocs`, `phd`, `ms`, `undergraduate`, or `alumni` (sections appear in that order; an empty one is hidden, and any other group name fails the build). Only `name` and `role` are required:
 
 ```yaml
   - name: Jane Doe

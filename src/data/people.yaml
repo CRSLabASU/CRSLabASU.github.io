@@ -38,6 +38,9 @@ phd:
       github: https://github.com/kevin-jatin-vora
   - name: Winston Smith
     role: "Ph.D. Student · Fall 2019–present"
+    links:
+      linkedin: https://www.linkedin.com/in/winston-smith-7b7930151/
+      scholar: https://scholar.google.com/citations?user=i_wO0NsAAAAJ&hl=en
     photo: /people/Winston.jpeg
   - name: Andrew Boateng
     role: "Ph.D. Student · Spring 2019–present"
@@ -52,13 +55,25 @@ phd:
       linkedin: https://www.linkedin.com/in/arhanni/
       scholar: https://scholar.google.com/citations?user=sDZ4u1oAAAAJ&hl=en
 
-ms:
-  - name: Utkarsh Ankit
-    role: "M.S. Student (Thesis) · Fall 2024–present"
-    photo: /people/Utkarsh.jpeg
+undergraduate:
+  - name: Ali Kefel
+    role: "B.S. Capstone Project · Spring 2026–present"
+    photo: /people/ali-kefel.JPG
+    links:
+      linkedin: https://www.linkedin.com/in/ali-kefel/
+      website: https://alikefel.github.io/
+      github: https://github.com/alikefel
+  - name: Nick Huynh
+    role: "B.S. Capstone Project · Spring 2026–present"
+    photo: /people/nick.webp
+  - name: Faisal Alyousefi
+    role: "B.S. Capstone Project · Spring 2026–present"
+    photo: /people/faisal.webp
+    links:
+      linkedin: https://www.linkedin.com/in/faisal-alyousefi/
+      
 
-  - name: Brent Julius
-    role: "M.S. Student (Thesis) · Spring 2024–present"
+
 
 alumni:
   - name: Ethan Clark

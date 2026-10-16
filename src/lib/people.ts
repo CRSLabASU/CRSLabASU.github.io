@@ -21,13 +21,17 @@ const personSchema = z.object({
   links: linksSchema,
 });
 
-const peopleFileSchema = z.object({
-  faculty: z.array(personSchema).default([]),
-  postdocs: z.array(personSchema).default([]),
-  phd: z.array(personSchema).default([]),
-  ms: z.array(personSchema).default([]),
-  alumni: z.array(personSchema).default([]),
-});
+// .strict() so a misspelled or unknown group name fails the build instead of silently disappearing.
+const peopleFileSchema = z
+  .object({
+    faculty: z.array(personSchema).default([]),
+    postdocs: z.array(personSchema).default([]),
+    phd: z.array(personSchema).default([]),
+    ms: z.array(personSchema).default([]),
+    undergraduate: z.array(personSchema).default([]),
+    alumni: z.array(personSchema).default([]),
+  })
+  .strict();
 
 export type Person = z.infer<typeof personSchema>;
 export type PeopleGroups = z.infer<typeof peopleFileSchema>;
@@ -37,13 +41,14 @@ const raw = yaml.load(peopleRaw);
 
 export const people: PeopleGroups = peopleFileSchema.parse(raw);
 
-export const peopleGroupOrder: PeopleGroupKey[] = ['faculty', 'postdocs', 'phd', 'ms', 'alumni'];
+export const peopleGroupOrder: PeopleGroupKey[] = ['faculty', 'postdocs', 'phd', 'ms', 'undergraduate', 'alumni'];
 
 export const peopleGroupLabels: Record<PeopleGroupKey, string> = {
   faculty: 'Faculty',
   postdocs: 'Postdoctoral Researchers',
   phd: 'Ph.D. Students',
   ms: 'M.S. Students',
+  undergraduate: 'Undergraduate Students',
   alumni: 'Alumni',
 };
 
