@@ -54,6 +54,13 @@ phd:
     links:
       linkedin: https://www.linkedin.com/in/arhanni/
       scholar: https://scholar.google.com/citations?user=sDZ4u1oAAAAJ&hl=en
+ms:
+  - name: Utkarsh Ankit
+    role: "M.S. Student (Thesis) · Fall 2024–present"
+    photo: /people/Utkarsh.jpeg
+
+  - name: Brent Julius
+    role: "M.S. Student (Thesis) · Spring 2024–present"
 
 undergraduate:
   - name: Ali Kefel
@@ -71,9 +78,6 @@ undergraduate:
     photo: /people/faisal.webp
     links:
       linkedin: https://www.linkedin.com/in/faisal-alyousefi/
-      
-
-
 
 alumni:
   - name: Ethan Clark
