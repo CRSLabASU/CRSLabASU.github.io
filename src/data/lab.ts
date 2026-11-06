@@ -5,6 +5,7 @@ export const lab = {
   department: 'School of Computing and Augmented Intelligence',
   address: 'Brickyard Engineering 594, 699 S Mill Ave, Tempe, AZ 85281',
   email: 'yzhan442@asu.edu',
+  wikiUrl: 'https://crs-lab-wiki.vercel.app/',
   director: 'Yu "Tony" Zhang',
   directorTitle: 'Associate Professor',
   mission:

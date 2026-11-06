@@ -13,7 +13,8 @@ const year = new Date().getFullYear();
     </div>
     <p class="meta m-0 max-w-[42ch] md:text-right">Supported by {lab.funders.join(', ')}</p>
   </div>
-  <div class="wrap border-rule-soft mt-6 border-t pt-4">
+  <div class="wrap border-rule-soft mt-6 flex flex-col gap-1 border-t pt-4 md:flex-row md:items-center md:justify-between">
     <p class="meta m-0">&copy; {year} {lab.shortName}, {lab.institution}.</p>
+    <a href={lab.wikiUrl} target="_blank" rel="noopener" class="meta text-maroon hover:text-maroon-deep">Lab Wiki</a>
   </div>
 </footer>
