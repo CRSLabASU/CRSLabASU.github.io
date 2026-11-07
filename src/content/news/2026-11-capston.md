@@ -6,4 +6,4 @@ images:
 - /images/news/capstone-robot-rescue.jpeg
 ---
 
-Our robot rescue capstone project is officially completed! A huge thanks to the magicians behind the scenes!
+Our robot rescue capstone project is officially completed! Huge thanks to the magicians behind the scenes!
